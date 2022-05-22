@@ -1,6 +1,6 @@
 # 6502_emulator
 This is a 6502 Emulator for Baffa-6502 Homebrew Computer Project and running Apple1's Steve Wozniak Monitor.
-Apple 1 Basic 1 is loaded at E000 address.
+Apple 1 Basic is loaded at E000 address.
 
 Project may be compiled using GCC/Mingw and Microsoft Visual C++
 
@@ -8,7 +8,7 @@ Project may be compiled using GCC/Mingw and Microsoft Visual C++
 
 ![Wozmonitor](imgs/example_wozmonitor.png?raw=true "Apple 1 Woz Monitor")
 
-![apple1basic](imgs/example_code.jpg?raw=true "Listing Basic Program")
+![apple1basic](imgs/example_basic.png?raw=true "Apple 1 Basic: Listing Program")
 
 
 
