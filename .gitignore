@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+/6502_vc/6502_emul/x64
+/6502_vc/6502_emul/6502_emul/x64
+/build
+/bin
+/.vscode
+/6502_vc/6502_emul/.vs
