@@ -27,7 +27,7 @@
 #include <pthread.h> 
 #endif
 
-#define SERVER_PORT 1234
+#define SERVER_PORT 1235
 
 #ifdef _MSC_VER    
 DWORD WINAPI TelnetClientThread(LPVOID pParam)

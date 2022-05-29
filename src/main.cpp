@@ -227,7 +227,7 @@ uint8_t m6821_input(struct m6821 *pia, int port) {
 }
 void m6821_output(struct m6821 *pia, uint8_t data) {
 
-	if (data < 0x7F && data != 0x1b) {
+	if (data > 0 && data < 0x7F && data != 0x1b) {
 		if (data == 0xd)
 			printf("%c", '\n');
 		else

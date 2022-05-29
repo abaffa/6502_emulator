@@ -1,6 +1,6 @@
 /* MoarNES source - CPU.c
 
-   This open-source software is (c)2010-2013 Mike Chambers, and is released
+   This open-source software is (c)2010-2013 Mike Chambers, _and is released
    under the terms of the GNU GPL v2 license.
 
    This is my implementation of a MOS Technology 6502 CPU emulator. The
@@ -220,7 +220,7 @@ static void adc(void)
 	saveaccum(result);
 }
 
-static void and(void)
+static void _and(void)
 {
 	penaltyop = 1;
 	value = getvalue();
@@ -788,7 +788,7 @@ static void slo(void)
 static void rla(void)
 {
 	rol();
-	and ();
+	_and ();
 	if (penaltyop && penaltyaddr)
 		clockticks6502--;
 }
@@ -845,8 +845,8 @@ static void(*addrtable[256]) (void) = {
 static void(*optable[256]) (void) = {
 	brk, ora, nop, slo, nop, ora, asl, slo, php, ora, asl, nop, nop, ora, asl, slo, /* 0 */
 	bpl, ora, nop, slo, nop, ora, asl, slo, clc, ora, nop, slo, nop, ora, asl, slo,
-	jsr, and, nop, rla, bit, and, rol, rla, plp, and, rol, nop, bit, and, rol, rla,
-	bmi, and, nop, rla, nop, and, rol, rla, sec, and, nop, rla, nop, and, rol, rla,
+	jsr, _and, nop, rla, bit, _and, rol, rla, plp, _and, rol, nop, bit, _and, rol, rla,
+	bmi, _and, nop, rla, nop, _and, rol, rla, sec, _and, nop, rla, nop, _and, rol, rla,
 	rti, eor, nop, sre, nop, eor, lsr, sre, pha, eor, lsr, nop, jmp, eor, lsr, sre,
 	bvc, eor, nop, sre, nop, eor, lsr, sre, cli, eor, nop, sre, nop, eor, lsr, sre,
 	rts, adc, nop, rra, nop, adc, ror, rra, pla, adc, ror, nop, jmp, adc, ror, rra,

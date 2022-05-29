@@ -24,8 +24,8 @@
 
 #define EMULATOR_WINDOW_TITLE "6502 Emulator"
 
-#define SERVER_TELNET 1
-#define SERVER_WEB 0
+#define SERVER_TELNET 0
+#define SERVER_WEB 1
 
 #define DEBUG_OPCODE 0
 #define DEBUG_LOG 0

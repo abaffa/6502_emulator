@@ -22,7 +22,10 @@
 
 #include "queue_ll.h"
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(__linux__) || defined(__MINGW32__)
+#include <sys/socket.h> 
+#include <arpa/inet.h>
+#else
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -32,32 +35,22 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#else
-//# ifdef __linux__ // || defined(__MINGW32__)
 
-#include <sys/socket.h> 
-#include <arpa/inet.h>
 #endif
 
 #include <string>
 using namespace std;
 
-
-struct client_key {
-	char key;
-	int shift;
-};
-
 struct hw_web_client {
 
 	int running;
 	int index;
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 	SOCKET *client;
 #else
 	int *client;
 #endif
-	queue<struct client_key>* tty_in;
+	queue<unsigned char>* tty_in;
 	Queue* web_out;
 
 };
@@ -79,12 +72,8 @@ public:
 		this->currentline = "";
 	}
 	//void init(SOL1_CPU& sol1_cpu, struct hw_uart *hw_uart);
-	//void new_char(char c);
-	void start_server(queue<struct client_key>* tty_in);
-
-	size_t count_lines(const char *filename);
-	void clearfile();
-	int line(string newline, int append);
+	void new_char(char c);
+	void start_server(queue<unsigned char>* tty_in);
 
 };
 #endif

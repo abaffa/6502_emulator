@@ -1,6 +1,6 @@
 #ifndef __6502_H__
 #define __6502_H__
-
+#include <stdint.h>
 
 extern void init6502(void);
 extern void reset6502(void);

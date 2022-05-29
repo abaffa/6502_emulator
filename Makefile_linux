@@ -1,16 +1,16 @@
 INCLUDES= -I ./include
 FLAGS = -O3 -std=c++11
 
-OBJECTS=./build/hw_web.o ./build/linkedlist.o ./build/queue_ll.o ./build/tasm_opcode.o ./build/utils.o ./build/memory.o ./build/keyboard.o ./build/screen.o ./build/6502.o ./build/6821.o
+OBJECTS=./build/hw_web.o ./build/linkedlist.o ./build/queue_ll.o ./build/tasm_opcode.o ./build/utils.o ./build/memory.o ./build/keyboard.o ./build/screen.o ./build/6502.o ./build/6821.o ./build/hw_tty.o 
 
 all: ${OBJECTS} 
-		gcc ${FLAGS} ${INCLUDES} ./src/main.cpp ${OBJECTS} -L ./lib -lmingw32  -lwsock32 -o ./bin/main.exe	
+		gcc ${FLAGS} ${INCLUDES} ./src/main.cpp ${OBJECTS} -L ./lib -lstdc++ -lm -lncurses -pthread -o ./bin/main
 		
 ./build/hw_web.o:src/hw_web.cpp
 	gcc ${FLAGS} ${INCLUDES} ./src/hw_web.cpp -c -o ./build/hw_web.o
 
-./build/hw_tty.h.o:src/hw_tty.h.cpp
-	gcc ${FLAGS} ${INCLUDES} ./src/hw_tty.h.cpp -c -o ./build/hw_tty.h.o
+./build/hw_tty.o:src/hw_tty.cpp
+	gcc ${FLAGS} ${INCLUDES} ./src/hw_tty.cpp -c -o ./build/hw_tty.o
 
 ./build/linkedlist.o:src/linkedlist.cpp
 	gcc ${FLAGS} ${INCLUDES} ./src/linkedlist.cpp -c -o ./build/linkedlist.o
@@ -42,5 +42,5 @@ all: ${OBJECTS}
 
 
 clean:
-	del build\* /q
-	del bin\main.exe /q
+	rm build/* 
+	rm bin/main

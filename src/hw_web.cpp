@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <memory.h>
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 #include <windows.h>
 #else
 #include <pthread.h> 
@@ -37,7 +37,7 @@ using std::string;
 
 
 
-size_t HW_WEB::count_lines(const char *filename)
+size_t count_lines(const char *filename)
 {
 	ifstream myfile(filename);
 	string line;
@@ -49,7 +49,7 @@ size_t HW_WEB::count_lines(const char *filename)
 	return count;
 }
 
-void HW_WEB::clearfile() {
+void clearfile() {
 	ofstream fout;
 	fout.open("html.cache");// , ios::app);
 
@@ -57,11 +57,11 @@ void HW_WEB::clearfile() {
 	fout.close();
 }
 
-int HW_WEB::line(string newline, int append)
+int line(string newline, int append)
 {
 	string newfile = "";
 
-	if (append) {
+	if (append == 0) {
 		const char filename[] = "html.cache";
 		int i, count = (int)count_lines(filename);
 		ifstream myfile(filename);
@@ -74,7 +74,7 @@ int HW_WEB::line(string newline, int append)
 			}
 			while (getline(myfile, line))
 			{
-				newfile = newfile + line + "\n";
+				newfile = newfile + line;
 			}
 
 			myfile.close();
@@ -82,12 +82,12 @@ int HW_WEB::line(string newline, int append)
 	}
 
 	ofstream fout;
-	if (append)
-		fout.open("html.cache", ios::app);
+	if (append == 0)
+		fout.open("html.cache");// , ios::app);
 	else
-		fout.open("html.cache");
+		fout.open("html.cache", ios::app);
 
-	if (append)
+	if (append == 0)
 		fout << newfile;
 	fout << newline;
 
@@ -100,7 +100,27 @@ int HW_WEB::line(string newline, int append)
 }
 
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+void HW_WEB::new_char(char c) {
+
+
+	if (c == 0x0d) {
+		this->currentline = c;
+		line(this->currentline, 0);
+		this->currentline = "";
+	}
+	else if (c != 0x0a) {
+		this->currentline = c;
+		line(this->currentline, 1);
+		this->currentline = "";
+	}
+
+	//this->currentline = this->currentline + (char)c;
+}
+
+
+
+
+#ifdef _MSC_VER    
 DWORD WINAPI WebClientThread(LPVOID pParam)
 #else
 void *WebClientThread(void *pParam)
@@ -118,7 +138,7 @@ void *WebClientThread(void *pParam)
 	char lastchar = 0;
 	char startCMD = 0x00;
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 	SOCKET client = *(new_web_client.client);
 #else
 	int client = *(new_web_client.client);
@@ -148,24 +168,35 @@ void *WebClientThread(void *pParam)
 
 			if (cmd.find("cpu_command=") != std::string::npos)
 			{
-				int _cmd_start = 12 + cmd.find("cpu_command=");
-				int _shift = 10 + cmd.find("shift_key=");
-				string _cpu_command = cmd.substr(_cmd_start, cmd.find("shift_key=") - _cmd_start);
-				string _shift_key = cmd.substr(_shift, cmd.length() - _shift);
-				int lll = (int)_cpu_command.length();
+				string str3 = cmd.substr(12 + cmd.find("cpu_command="), cmd.length() - cmd.find("cpu_command="));
+				int lll = (int)str3.length();
 				if (lll > 0) {
-						const char *ccc = _cpu_command.c_str();
+					if (str3 == "tel") {
+						int in = new_web_client.index;
+
+						string rs = "terminal: " + to_string(in) + "\r\n";
+						line(rs, 1);
+						cout << rs;
+
+					}
+					else if (str3 == "cls") {
+						int in = new_web_client.index;
+
+						clearfile();
+						string rs = "*** clearing screen\r\n";
+						line(rs, 0);
+
+					}
+					else {
+						const char *ccc = str3.c_str();
 
 						for (i = 0; i < lll; i++) {
-							struct client_key k;
-							k.key = tolower(ccc[i]);
-							k.shift = _shift_key == "1";
-
-							new_web_client.tty_in->push(k);
+							new_web_client.tty_in->push(ccc[i]);
 							//new_web_client.hw_uart->receive(ccc[i]);
 						}
-						//new_web_client.tty_in->push('\r');
+						new_web_client.tty_in->push('\r');
 						//new_web_client.hw_uart->receive('\r');
+					}
 				}
 
 
@@ -206,7 +237,7 @@ void *WebClientThread(void *pParam)
 			send(client, cur_response.c_str(), (int)cur_response.length(), 0);
 			//Content - Length: 12\r\n
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER     
 			Sleep(1000);
 #else
 			int milliseconds = 1000;
@@ -223,7 +254,7 @@ void *WebClientThread(void *pParam)
 
 	}
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER     
 	closesocket(client);
 #else
 	shutdown(client, 2);
@@ -236,7 +267,7 @@ void *WebClientThread(void *pParam)
 }
 
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 DWORD WINAPI WebServerThread(LPVOID pParam)
 #else
 void *WebServerThread(void *pParam)
@@ -245,7 +276,7 @@ void *WebServerThread(void *pParam)
 
 	struct hw_web_client* clients = (struct hw_web_client*)pParam;
 	sockaddr_in local;
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 	SOCKET server;
 	WSADATA wsaData;
 	int wsaret = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -259,9 +290,9 @@ void *WebServerThread(void *pParam)
 #endif
 	local.sin_family = AF_INET;
 	local.sin_addr.s_addr = INADDR_ANY;
-	local.sin_port = htons((u_short)20080);
+	local.sin_port = htons((u_short)20090);
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER   
 	server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (server == INVALID_SOCKET)
 	{
@@ -284,7 +315,7 @@ void *WebServerThread(void *pParam)
 
 
 	sockaddr_in from;
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 	SOCKET client;
 	int fromlen = sizeof(from);
 #else
@@ -314,7 +345,7 @@ void *WebServerThread(void *pParam)
 			}
 		}
 		if (new_web_client != NULL) {
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER    
 			DWORD tid = 100 + new_web_client->index;
 			HANDLE myHandle = CreateThread(0, 0, WebClientThread, new_web_client, 0, &tid);
 #else
@@ -326,7 +357,7 @@ void *WebServerThread(void *pParam)
 
 			char *buf_send = (char*)"No pool available.\n";
 			send(client, buf_send, (int)strlen(buf_send), 0);
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER     
 			closesocket(client);
 #else
 			shutdown(client, 2);
@@ -335,11 +366,11 @@ void *WebServerThread(void *pParam)
 		}
 	}
 	return 0;
-}
+	}
 
 
 
-void HW_WEB::start_server(queue<struct client_key>* tty_in) {
+void HW_WEB::start_server(queue<unsigned char>* tty_in) {
 
 	int i;
 
@@ -352,7 +383,7 @@ void HW_WEB::start_server(queue<struct client_key>* tty_in) {
 		this->clients[i].web_out = queue_create();
 	}
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef _MSC_VER        
 	DWORD tid;
 	HANDLE myHandle = CreateThread(0, 0, WebServerThread, &this->clients, 0, &tid);
 #else

@@ -22,8 +22,11 @@
 #include "hw_tty_client.h"
 #include <queue>
 
+
 #if defined(__linux__) || defined(__MINGW32__)
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 #else
 #include <mutex> 
